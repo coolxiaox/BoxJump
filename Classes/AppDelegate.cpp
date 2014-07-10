@@ -1,6 +1,10 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
 
+#include "PlayLayer.h"
+
+#include "spritebuilder/SpriteBuilder.h"
+
 USING_NS_CC;
 
 AppDelegate::AppDelegate() {
@@ -21,13 +25,20 @@ bool AppDelegate::applicationDidFinishLaunching() {
     }
 
     // turn on display FPS
-    director->setDisplayStats(true);
+//    director->setDisplayStats(true);
 
     // set FPS. the default value is 1.0/60 if you don't call this
     director->setAnimationInterval(1.0 / 60);
+	
+	Size designSize  = Size(600, 200);
+	Size size = director->getWinSize();
+	float scaleFactor = size.height / designSize.height;
+	glview->setDesignResolutionSize(designSize.width, designSize.height, ResolutionPolicy::EXACT_FIT);
+	director->setContentScaleFactor(scaleFactor / (size.height / 200)); //because the current resource is phone's
+	spritebuilder::CCBReader::setupSpriteBuilder("resources-phone", 1);
 
     // create a scene. it's an autorelease object
-    auto scene = HelloWorld::createScene();
+    auto scene = PlayLayer::createScene();
 
     // run
     director->runWithScene(scene);
