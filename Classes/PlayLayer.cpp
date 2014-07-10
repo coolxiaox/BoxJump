@@ -133,7 +133,7 @@ void PlayLayer::setPlayerJumpVelocity()
 	{
 		return;
 	}
-	
+		
 	jumping++;
 	
 	Point origPos = player->getPosition();
@@ -174,6 +174,7 @@ void PlayLayer::play(float dt)
 void PlayLayer::loadLevelCube()
 {
 	setPlayerNoJumping();
+	player->stopAllActions();
 	
 	curLevel++;
 
@@ -235,15 +236,16 @@ void PlayLayer::loadLevelCube()
 		}
 	}
 	
+	jumping = 8; // set max value to avoid jump action when it start
 	player->setPosition(origPos);
 	MoveTo *moveTo = MoveTo::create(0.8, Point(origPos.x, line->getPositionY() + player->getContentSize().height/2));
 	if (!isStart)
 	{
-		player->runAction(moveTo);
+		player->runAction(Sequence::create(moveTo, CallFunc::create(CC_CALLBACK_0(PlayLayer::setPlayerNoJumping, this)), NULL));
 	}
 	else
 	{
-		player->runAction(Sequence::create(moveTo, CallFunc::create(CC_CALLBACK_0(PlayLayer::setPlayerRunVelocity, this)), NULL));
+		player->runAction(Sequence::create(moveTo, CallFunc::create(CC_CALLBACK_0(PlayLayer::setPlayerNoJumping, this)), CallFunc::create(CC_CALLBACK_0(PlayLayer::setPlayerRunVelocity, this)), NULL));
 	}
 }
 
@@ -279,7 +281,7 @@ void PlayLayer::loadLevelCube()
 
 bool PlayLayer::onTouchBegan(cocos2d::Touch *touch, cocos2d::Event *event)
 {
-	if (!isStart)
+	if ((isStart == 0) && (jumping == 0))
 	{
 		tipsLabel->setVisible(false);
 		
